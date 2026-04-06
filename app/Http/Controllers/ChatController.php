@@ -43,6 +43,9 @@ class ChatController extends Controller
                 metadata:         $request->input('metadata', []),
                 ipAddress:        $request->ip() ?? '',
                 userAgent:        $request->userAgent(),
+                tenantSlug:       $request->filled('tenant_slug')
+                    ? $request->string('tenant_slug')->trim()->value()
+                    : null,
             );
 
             return response()->json([
@@ -72,7 +75,10 @@ class ChatController extends Controller
     public function history(string $uuid): JsonResponse
     {
         $conversation = Conversation::where('uuid', $uuid)
-            ->with(['messages' => fn ($q) => $q->whereIn('role', ['user', 'assistant'])])
+            ->with([
+                'tenant',
+                'messages' => fn ($q) => $q->whereIn('role', ['user', 'assistant']),
+            ])
             ->firstOrFail();
 
         $messages = $conversation->messages->map(fn ($msg) => [
@@ -86,6 +92,7 @@ class ChatController extends Controller
             'success' => true,
             'data'    => [
                 'conversation_uuid' => $conversation->uuid,
+                'tenant_slug'       => $conversation->tenant?->slug,
                 'status'            => $conversation->status,
                 'messages'          => $messages,
             ],

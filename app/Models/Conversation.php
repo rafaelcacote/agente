@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -13,6 +14,7 @@ class Conversation extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'tenant_id',
         'uuid',
         'source',
         'status',
@@ -43,9 +45,15 @@ class Conversation extends Model
     // Relacionamentos
     // -------------------------------------------------------------------------
 
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
     public function messages(): HasMany
     {
-        return $this->hasMany(Message::class)->orderBy('created_at');
+        // Usa ID para garantir ordenação estável mesmo com timestamps iguais.
+        return $this->hasMany(Message::class)->orderBy('id');
     }
 
     // -------------------------------------------------------------------------
@@ -69,7 +77,7 @@ class Conversation extends Model
     {
         return $this->messages()
             ->whereIn('role', ['user', 'assistant'])
-            ->latest()
+            ->orderByDesc('id')
             ->limit($limit)
             ->get()
             ->reverse()

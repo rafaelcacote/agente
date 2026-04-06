@@ -265,6 +265,7 @@
 
     <div class="debug-bar">
         <div>UUID da conversa: <span id="debug-uuid">—</span></div>
+        <div>Tenant: <span id="debug-tenant">—</span></div>
         <div>Tokens usados: <span id="debug-tokens">—</span></div>
         <div>Modelo: <span id="debug-model">—</span></div>
     </div>
@@ -283,8 +284,12 @@
     const btnSend         = document.getElementById('btn-send');
     const emptyState      = document.getElementById('empty-state');
     const debugUuid       = document.getElementById('debug-uuid');
+    const debugTenant     = document.getElementById('debug-tenant');
     const debugTokens     = document.getElementById('debug-tokens');
     const debugModel      = document.getElementById('debug-model');
+
+    /** Slug da empresa (multi-tenant). Deve existir na tabela `tenants` (veja TenantSeeder). */
+    const TENANT_SLUG     = 'default';
 
     let conversationUuid  = null;
     let isLoading         = false;
@@ -316,6 +321,7 @@
                 body: JSON.stringify({
                     message:           text,
                     conversation_uuid: conversationUuid,
+                    tenant_slug:       TENANT_SLUG,
                     source:            'web-test',
                 }),
             });
@@ -330,7 +336,7 @@
             }
 
             conversationUuid = data.data.conversation_uuid;
-            updateDebugBar(data.data.reply);
+            updateDebugBar(data.data.reply, data.data);
             appendMessage('assistant', data.data.reply.content);
 
         } catch (err) {
@@ -396,8 +402,9 @@
         messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    function updateDebugBar(reply) {
+    function updateDebugBar(reply, payload) {
         debugUuid.textContent   = conversationUuid || '—';
+        debugTenant.textContent = payload?.tenant_slug || '—';
         debugModel.textContent  = reply.model || '—';
         debugTokens.textContent = reply.tokens?.total ? `${reply.tokens.total} total` : '—';
     }

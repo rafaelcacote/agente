@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SendChatMessageRequest extends FormRequest
 {
@@ -16,6 +17,14 @@ class SendChatMessageRequest extends FormRequest
         return [
             // UUID da conversa existente — null para iniciar nova conversa
             'conversation_uuid' => ['nullable', 'string', 'uuid', 'exists:conversations,uuid'],
+
+            // Empresa (tenant) — na primeira mensagem define qual agente; na continuação pode omitir
+            'tenant_slug' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::exists('tenants', 'slug')->where('is_active', true),
+            ],
 
             // Mensagem do usuário: obrigatória, máximo de 4000 caracteres
             'message' => ['required', 'string', 'min:1', 'max:4000'],
@@ -36,6 +45,7 @@ class SendChatMessageRequest extends FormRequest
             'message.max'      => 'A mensagem não pode ter mais de 4000 caracteres.',
             'conversation_uuid.uuid'   => 'O identificador de conversa é inválido.',
             'conversation_uuid.exists' => 'A conversa informada não foi encontrada.',
+            'tenant_slug.exists'       => 'O tenant informado não existe ou está inativo.',
         ];
     }
 }

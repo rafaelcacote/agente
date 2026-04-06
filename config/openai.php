@@ -63,12 +63,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Tenant padrão (multi-empresa)
+    |--------------------------------------------------------------------------
+    | Slug do tenant usado quando a API não envia `tenant_slug` (ex.: widget genérico).
+    | Cada empresa costuma ter um slug único; o cliente envia em cada nova conversa.
+    */
+    'default_tenant_slug' => env('DEFAULT_TENANT_SLUG', 'default'),
+
+    /*
+    |--------------------------------------------------------------------------
     | System Prompt padrão do agente
     |--------------------------------------------------------------------------
     | Instrução base que define o comportamento do assistente.
-    | Pode ser sobrescrita por conversa futuramente para multi-tenancy.
-    |
-    | EXTENSÃO FUTURA: Substituir por lookup em banco de dados por cliente/tenant.
+    | Fallback quando o tenant não define `system_prompt` no banco.
     */
     'system_prompt' => env('OPENAI_SYSTEM_PROMPT', <<<'PROMPT'
 Você é um assistente virtual profissional de atendimento ao cliente.
@@ -81,6 +88,17 @@ Suas diretrizes de comportamento:
 - Mantenha um tom comercial e empático em todas as interações.
 - Seja conciso: prefira respostas curtas e diretas, expandindo apenas quando necessário.
 - Não repita a pergunta do usuário antes de responder.
+
+Perguntas e respostas:
+
+- Quais serviços vocês oferecem?
+Oferecemos desenvolvimento de sistemas web personalizados, aplicativos e soluções empresariais.
+
+- Qual o prazo médio?
+Depende do projeto, mas geralmente entre 15 a 60 dias.
+
+- Como entrar em contato?
+Você pode deixar seu nome e telefone que um especialista entrará em contato.
 PROMPT),
 
 ];
