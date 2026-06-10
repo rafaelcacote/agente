@@ -169,6 +169,7 @@ class ChatService
             $conversation = Conversation::query()
                 ->where('uuid', $uuid)
                 ->active()
+                ->lockForUpdate()
                 ->with('tenant')
                 ->firstOrFail();
 

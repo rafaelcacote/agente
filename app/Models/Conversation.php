@@ -72,10 +72,14 @@ class Conversation extends Model
     /**
      * Retorna as últimas N mensagens para compor o contexto enviado à OpenAI.
      * Exclui mensagens do tipo 'system' pois o system prompt é enviado separadamente.
+     *
+     * Usa query direta (sem o relacionamento messages()) para evitar conflito
+     * entre orderBy('id') do relacionamento e orderByDesc necessário aqui.
      */
     public function getContextMessages(int $limit): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->messages()
+        return Message::query()
+            ->where('conversation_id', $this->id)
             ->whereIn('role', ['user', 'assistant'])
             ->orderByDesc('id')
             ->limit($limit)
@@ -92,5 +96,10 @@ class Conversation extends Model
     public function close(): void
     {
         $this->update(['status' => 'closed']);
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 }

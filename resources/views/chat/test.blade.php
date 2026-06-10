@@ -290,6 +290,7 @@
 
     /** Slug da empresa (multi-tenant). Deve existir na tabela `tenants` (veja TenantSeeder). */
     const TENANT_SLUG     = 'default';
+    const API_KEY         = @json(env('DEFAULT_TENANT_API_KEY', ''));
 
     let conversationUuid  = null;
     let isLoading         = false;
@@ -311,13 +312,20 @@
         const typingEl = showTyping();
 
         try {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept':       'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'X-Tenant-Slug': TENANT_SLUG,
+            };
+
+            if (API_KEY) {
+                headers['X-Agent-Key'] = API_KEY;
+            }
+
             const response = await fetch(API_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept':       'application/json',
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                },
+                headers: headers,
                 body: JSON.stringify({
                     message:           text,
                     conversation_uuid: conversationUuid,

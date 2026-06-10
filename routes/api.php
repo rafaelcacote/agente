@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Route;
 | API Routes — Chat Agent
 |--------------------------------------------------------------------------
 | Prefixo automático: /api  (configurado em bootstrap/app.php)
-| Middleware padrão: throttle:api, substitutebindings
-|
-| EXTENSÃO FUTURA: adicionar autenticação via Sanctum ou API Key
-|   Route::middleware('auth:sanctum')->group(function () { ... });
+| Middleware: throttle, tenant.api-key, tenant.origin, chat.security
 */
 
-Route::prefix('chat')->name('api.chat.')->group(function () {
+Route::prefix('chat')
+    ->name('api.chat.')
+    ->middleware(['throttle:chat', 'throttle:chat-tenant', 'tenant.api-key'])
+    ->group(function () {
 
     // Envia mensagem e recebe resposta da IA
     Route::post('/message', [ChatController::class, 'send'])->name('send');

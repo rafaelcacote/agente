@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site fictício — Widget Agente</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            margin: 0;
+            background: #faf7f2;
+            color: #333;
+        }
+        header {
+            background: #2c3e50;
+            color: #fff;
+            padding: 2rem;
+            text-align: center;
+        }
+        main {
+            max-width: 720px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+            line-height: 1.7;
+        }
+        .note {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 1rem 1.25rem;
+            margin: 2rem 0;
+            font-family: sans-serif;
+            font-size: .9rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Loja Exemplo Ltda.</h1>
+    <p>Um site fictício para testar o widget embeddable</p>
+</header>
+
+<main>
+    <p>
+        Esta é uma página HTML estática, sem Laravel — simula o site de um cliente
+        que integrou o agente com uma única tag <code>&lt;script&gt;</code>.
+    </p>
+    <p>
+        O widget aparece no canto da tela. Abra o chat, envie mensagens e recarregue
+        a página para verificar se a conversa foi retomada via <code>localStorage</code>.
+    </p>
+    <div class="note">
+        <strong>CORS:</strong> para este HTML funcionar em outro domínio, cadastre a origem
+        em <code>CORS_ALLOWED_ORIGINS</code> (.env) e em <code>tenants.settings.allowed_origins</code>.
+        No mesmo domínio da API (como aqui), funciona sem configuração extra.
+    </div>
+</main>
+
+<!--
+  Em produção, aponte para o domínio da API:
+  src="https://api.seudominio.com/widget/agente.js"
+-->
+<script
+    src="/widget/agente.js"
+    data-tenant="default"
+    data-position="bottom-left"
+    data-primary-color="#2c3e50"
+    data-greeting="Bem-vindo à Loja Exemplo! Em que posso ajudar?"
+    data-api-key="CONFIGURE_SUA_API_KEY"
+    async
+></script>
+
+</body>
+</html>
